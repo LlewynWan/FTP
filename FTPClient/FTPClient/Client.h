@@ -47,14 +47,13 @@ public:
 	int fileSize(string fileName);
 
 	//下载文件
-	int downloadFile(string fileName, string directory=".");
+	int downloadFile(string fileName, string directory=".", int breakpoint=0);
 
 	//上传文件
-	int uploadFile(string fileName);
+	int uploadFile(string fileName, int breakpoint=0);
 
 	//关闭连接
 	int quit();
-
 
 private:
 	//用户名和密码

@@ -284,7 +284,7 @@ void writeFile(string fileName, char buf[], int len)
 }
 
 
-int Client::downloadFile(string fileName, string directory)
+int Client::downloadFile(string fileName, string directory, int breakpoint)
 {
 	int size = fileSize(fileName);
 	if (size == -10) {
@@ -348,8 +348,11 @@ void readFile(string fileName)
 }
 
 
-int Client::uploadFile(string fileName)
+int Client::uploadFile(string fileName, int breakpoint)
 {
+	if (breakpoint != 0) {
+		int size = fileSize(fileName);
+	}
 	code = dataConnect(passiveMode);
 	if (code == SOCKET_ERROR) {
 		dataDisconnect();
@@ -393,7 +396,6 @@ int Client::uploadFile(string fileName)
 	recvMessage();
 	return code;
 }
-
 
 int Client::quit()
 {

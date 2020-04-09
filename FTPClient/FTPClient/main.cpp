@@ -33,35 +33,35 @@ int test()
 
 
 	//µÇÂ¼
-	//string username, password;
-	//cout << "ÇëÊäÈëÕË»§Ãû:";
-	//cin >> username;
-	//cout << "ÇëÊäÈëÃÜÂë:";
-	//cin >> password;
-	//client.setUsername(username);
-	//client.setPassword(password);
-	//res = client.login();
-	//while (res != PASSWORD_OKAY) {
-	//	if (res == SOCKET_ERROR) {
-	//		cout << "ÍøÂçÁ¬½Ó´íÎó" << endl;
-	//		break;
-	//	}
-	//	else {
-	//		cout << "ÕËºÅ»òÕßÃÜÂë´íÎó" << endl;
-	//	}
-	//	cout << "ÇëÊäÈëÕË»§Ãû:";
-	//	cin >> username;
-	//	cout << "ÇëÊäÈëÃÜÂë:";
-	//	cin >> password;
-	//	client.setUsername(username);
-	//	client.setPassword(password);
-	//	res = client.login();
-	//}
-	//cout << "µÇÂ¼³É¹¦\n";
+	string username, password;
+	cout << "ÇëÊäÈëÕË»§Ãû:";
+	cin >> username;
+	cout << "ÇëÊäÈëÃÜÂë:";
+	cin >> password;
+	client.setUsername(username);
+	client.setPassword(password);
+	res = client.login();
+	while (res != PASSWORD_OKAY) {
+		if (res == SOCKET_ERROR) {
+			cout << "ÍøÂçÁ¬½Ó´íÎó" << endl;
+			break;
+		}
+		else {
+			cout << "ÕËºÅ»òÕßÃÜÂë´íÎó" << endl;
+		}
+		cout << "ÇëÊäÈëÕË»§Ãû:";
+		cin >> username;
+		cout << "ÇëÊäÈëÃÜÂë:";
+		cin >> password;
+		client.setUsername(username);
+		client.setPassword(password);
+		res = client.login();
+	}
+	cout << "µÇÂ¼³É¹¦\n";
 
-	client.setUsername("chengzhangyi");
-	client.setPassword("456789");
-	client.login();
+	//client.setUsername("chengzhangyi");
+	//client.setPassword("456789");
+	//client.login();
 
 	do {
 		char command;
