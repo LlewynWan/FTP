@@ -50,7 +50,7 @@ public:
 	int downloadFile(string fileName, string directory=".", int breakpoint=0);
 
 	//上传文件
-	int uploadFile(string fileName, int breakpoint=0);
+	int uploadFile(string fileName, bool append=true);
 
 	//关闭连接
 	int quit();

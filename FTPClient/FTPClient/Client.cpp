@@ -348,11 +348,18 @@ void readFile(string fileName)
 }
 
 
-int Client::uploadFile(string fileName, int breakpoint)
+int Client::uploadFile(string filePath, bool append)
 {
-	if (breakpoint != 0) {
-		int size = fileSize(fileName);
+	//在外面应该检测文件是否存在
+	ifstream in(filePath, ios::binary);
+	if (!in.good()) {
+		dataDisconnect();
+		return FILE_OPEN_ERROR;
 	}
+	//获取文件名
+	string fileName = filePath.substr(filePath.find_last_of("/") + 1);
+
+	//打开数据连接
 	code = dataConnect(passiveMode);
 	if (code == SOCKET_ERROR) {
 		dataDisconnect();
@@ -360,6 +367,14 @@ int Client::uploadFile(string fileName, int breakpoint)
 	}
 
 	command = "STOR " + fileName;
+	if (append == true) {
+		int size = fileSize(filePath);
+		if (size > 0) {
+			in.seekg(size);
+			command = "APPE " + fileName;
+		}
+	}
+	
 	sendCommand();
 	if (code == SOCKET_ERROR) {
 		dataDisconnect();
@@ -369,13 +384,6 @@ int Client::uploadFile(string fileName, int breakpoint)
 	if (code != DATA_CONNECT) {
 		dataDisconnect();
 		return code;
-	}
-
-	//在外面应该检测文件是否存在
-	ifstream in(fileName, ios::binary);
-	if (!in.good()) {
-		dataDisconnect();
-		return FILE_OPEN_ERROR;
 	}
 
 	memset(sendbuf, 0, sizeof(sendbuf));

@@ -32,43 +32,43 @@ int test()
 	res = client.connectServer();
 
 
-	//登录
-	string username, password;
-	cout << "请输入账户名:";
-	cin >> username;
-	cout << "请输入密码:";
-	cin >> password;
-	client.setUsername(username);
-	client.setPassword(password);
-	res = client.login();
-	while (res != PASSWORD_OKAY) {
-		if (res == SOCKET_ERROR) {
-			cout << "网络连接错误" << endl;
-			break;
-		}
-		else {
-			cout << "账号或者密码错误" << endl;
-		}
-		cout << "请输入账户名:";
-		cin >> username;
-		cout << "请输入密码:";
-		cin >> password;
-		client.setUsername(username);
-		client.setPassword(password);
-		res = client.login();
-	}
-	cout << "登录成功\n";
+	////登录
+	//string username, password;
+	//cout << "请输入账户名:";
+	//cin >> username;
+	//cout << "请输入密码:";
+	//cin >> password;
+	//client.setUsername(username);
+	//client.setPassword(password);
+	//res = client.login();
+	//while (res != PASSWORD_OKAY) {
+	//	if (res == SOCKET_ERROR) {
+	//		cout << "网络连接错误" << endl;
+	//		break;
+	//	}
+	//	else {
+	//		cout << "账号或者密码错误" << endl;
+	//	}
+	//	cout << "请输入账户名:";
+	//	cin >> username;
+	//	cout << "请输入密码:";
+	//	cin >> password;
+	//	client.setUsername(username);
+	//	client.setPassword(password);
+	//	res = client.login();
+	//}
+	//cout << "登录成功\n";
 
-	//client.setUsername("chengzhangyi");
-	//client.setPassword("456789");
-	//client.login();
+	client.setUsername("anonymous");
+	client.setPassword("");
+	client.login();
 
 	do {
 		char command;
-		int size = 0;
+		int size = 0, mode;
 		string listRes, fileName, dir;
 		intro();
-		cin >> command;
+l:		cin >> command;
 		switch (command)
 		{
 		case '1':
@@ -95,7 +95,18 @@ int test()
 			//上传文件
 			cout << "请输出要传入的文件路径:";
 			cin >> fileName;
-			res = client.uploadFile(fileName);
+			size = client.fileSize(fileName.substr(fileName.find_last_of('/')));
+			if (size != -10) {
+				cout << "文件在服务端已经存在了，请选择覆盖文件还是断点续传（1.覆盖文件2.断点续传）:";
+				int i; cin >> i;
+				if (i == 1) {
+					mode = false;
+				}
+				else if (i == 2) {
+					mode = true;
+				}
+			}
+			res = client.uploadFile(fileName, mode);  
 			if (res != DATA_TRANSFER_COMPLETE) {
 				cout << "文件传输失败：";
 				if (res == FILE_OPEN_ERROR) {
@@ -123,7 +134,7 @@ int test()
 			return 0;
 			break;
 		default:
-			break;
+			goto l;
 		}
 	} while (1);
 }
