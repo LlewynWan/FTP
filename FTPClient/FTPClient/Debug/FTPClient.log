@@ -1,5 +1,6 @@
 ﻿  Client.cpp
 d:\项目\网络设计程序\ftp\ftpclient\ftpclient\client.cpp(174): warning C4018: “<”: 有符号/无符号不匹配
 d:\项目\网络设计程序\ftp\ftpclient\ftpclient\client.cpp(178): warning C4018: “<”: 有符号/无符号不匹配
-d:\项目\网络设计程序\ftp\ftpclient\ftpclient\client.cpp(393): warning C4244: “=”: 从“std::streamsize”转换到“int”，可能丢失数据
+d:\项目\网络设计程序\ftp\ftpclient\ftpclient\client.cpp(302): warning C4244: “=”: 从“std::streamoff”转换到“int”，可能丢失数据
+d:\项目\网络设计程序\ftp\ftpclient\ftpclient\client.cpp(409): warning C4244: “=”: 从“std::streamsize”转换到“int”，可能丢失数据
   FTPClient.vcxproj -> D:\项目\网络设计程序\FTP\FTPClient\Debug\FTPClient.exe

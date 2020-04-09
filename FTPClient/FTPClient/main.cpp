@@ -23,6 +23,12 @@ void intro()
 	}
 }
 
+bool fileExist(string filePath)
+{
+	ifstream f(filePath);
+	if (f.good()) return true;
+	else return false;
+}
 
 int test()
 {
@@ -66,7 +72,7 @@ int test()
 	do {
 		char command;
 		int size = 0, mode;
-		string listRes, fileName, dir;
+		string listRes, fileName, dir, filePath;
 		intro();
 l:		cin >> command;
 		switch (command)
@@ -97,7 +103,7 @@ l:		cin >> command;
 			cin >> fileName;
 			size = client.fileSize(fileName.substr(fileName.find_last_of('/')));
 			if (size != -10) {
-				cout << "文件在服务端已经存在了，请选择覆盖文件还是断点续传（1.覆盖文件2.断点续传）:";
+				cout << "文件在服务端已经存在了，请选择覆盖文件还是断点续传（1.覆盖文件2.断点续传）:\n";
 				int i; cin >> i;
 				if (i == 1) {
 					mode = false;
@@ -123,7 +129,20 @@ l:		cin >> command;
 			cin >> fileName;
 			cout << "请输入存储的目录:";
 			cin >> dir;
-			res = client.downloadFile(fileName, dir);
+			filePath = dir + "//" + fileName;
+			mode = false;
+			if (fileExist(filePath)) {
+				cout << "要下载的文件已经存在了(1.重新下载 2.继续上次下载 3.退出下载):";
+				int i; cin >> i;
+				if (i == 1) {
+					mode = false;
+				}
+				else if (i == 2) {
+					mode = true;
+				}
+				else break;
+			}
+			res = client.downloadFile(fileName, dir, mode);
 			if (res != DATA_TRANSFER_COMPLETE) {
 				cout << "文件传输失败\n";
 			}

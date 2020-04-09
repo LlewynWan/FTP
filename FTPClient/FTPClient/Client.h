@@ -47,7 +47,7 @@ public:
 	int fileSize(string fileName);
 
 	//下载文件
-	int downloadFile(string fileName, string directory=".", int breakpoint=0);
+	int downloadFile(string fileName, string directory=".", bool append=0);
 
 	//上传文件
 	int uploadFile(string fileName, bool append=true);

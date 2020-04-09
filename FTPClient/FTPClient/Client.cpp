@@ -284,25 +284,41 @@ void writeFile(string fileName, char buf[], int len)
 }
 
 
-int Client::downloadFile(string fileName, string directory, int breakpoint)
+int Client::downloadFile(string fileName, string directory, bool append)
 {
 	int size = fileSize(fileName);
+	int oldSize = 0;
 	if (size == -10) {
 		return -10;
 	}
 
+	//注意要使用二进制模式读取文件
+	ofstream newFile;
+	if (append == true) {
+		newFile.open(directory + "//" + fileName, ios::app | ios::binary);
+
+		//获取文件的大小
+		newFile.seekp(0, ios::end);
+		oldSize = newFile.tellp();
+		
+		if (oldSize <= size) {
+			command = "REST " + to_string(oldSize);
+			sendCommand();
+			if (code == SOCKET_ERROR) {
+				return code;
+			}
+			recvMessage();
+		}
+	}
+	else newFile.open(directory + "//" + fileName, ios::trunc | ios::binary);
+	
+	//打开数据连接
 	code = dataConnect(passiveMode);
 	if (code == SOCKET_ERROR) return code;
-
-	//首先创建新文件
-	//注意要使用二进制模式读取文件
-	ofstream newFile(directory + "//" + fileName, ios::trunc | ios::binary);
-	
 
 	command = "RETR " + fileName;
 	sendCommand();
 	if (code == SOCKET_ERROR) {
-		dataDisconnect();
 		return code;
 	}
 	recvMessage();
@@ -312,7 +328,7 @@ int Client::downloadFile(string fileName, string directory, int breakpoint)
 
 	memset(recvbuf, 0, sizeof(recvbuf));
 	//接收文件
-	int remainLen = size, len = 0, curIndex = 0;
+	int remainLen = size - oldSize, len = 0, curIndex = 0;
 	while ( remainLen > 0 ) {
 		len = recv(dataSocket, recvbuf + curIndex, sizeof(char) * (1024 - curIndex), 0);
 		if (len == SOCKET_ERROR) {
@@ -328,6 +344,7 @@ int Client::downloadFile(string fileName, string directory, int breakpoint)
 	}
 	newFile.write(recvbuf, curIndex);
 
+	cout << "文件传输完毕\n";
 
 	dataDisconnect();
 	//关闭文件
@@ -350,7 +367,7 @@ void readFile(string fileName)
 
 int Client::uploadFile(string filePath, bool append)
 {
-	//在外面应该检测文件是否存在
+	//检测文件是否存在
 	ifstream in(filePath, ios::binary);
 	if (!in.good()) {
 		dataDisconnect();
@@ -366,6 +383,7 @@ int Client::uploadFile(string filePath, bool append)
 		return code;
 	}
 
+	//判断是否使用断点续传
 	command = "STOR " + fileName;
 	if (append == true) {
 		int size = fileSize(filePath);
