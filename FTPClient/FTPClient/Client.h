@@ -10,9 +10,13 @@
 #define CONNECT 220
 #define USERNAME_OKAY 331
 #define PASSWORD_OKAY 230
+
 #define PASSIVE_MODE 227
 #define DATA_CONNECT 125
+#define DATA_CONNECT_ASCII 150
 #define DATA_TRANSFER_COMPLETE 226
+
+#define FILE_OPEN_ERROR 900
 
 using namespace std;
 

@@ -1,6 +1,8 @@
 #include"Client.h"
 #include<sstream>
 #include<fstream>
+#include<io.h>
+
 
 using namespace std;
 
@@ -149,8 +151,10 @@ int Client::login()
 int Client::enterPassiveMode()
 {
 	command = "PASV";
-	sendCommand();
+	code = sendCommand();
+	if (code != 0) return code;
 	recvMessage();
+	if (code == SOCKET_ERROR) return code;
 
 	//解析服务器发送的数据
 	string num[6];
@@ -200,7 +204,13 @@ int Client::enterPassiveMode()
 //建立和断开数据连接
 int Client::dataConnect(int mode)
 {
-	return enterPassiveMode();
+	if (mode == passiveMode) {
+		return enterPassiveMode();
+	}
+	else {
+		return 0;
+	}
+
 }
 int Client::dataDisconnect()
 {
@@ -254,8 +264,12 @@ int Client::fileSize(string fileName)
 		ss >> size; 
 		return size;
 	}
+	else if (code==550){
+		recvMessage();
+		return -10;
+	}
 	else {
-		return 0;
+		return SOCKET_ERROR;
 	}
 }
 
@@ -273,16 +287,28 @@ void writeFile(string fileName, char buf[], int len)
 int Client::downloadFile(string fileName, string directory)
 {
 	int size = fileSize(fileName);
+	if (size == -10) {
+		return -10;
+	}
 
-	dataConnect(passiveMode);
+	code = dataConnect(passiveMode);
+	if (code == SOCKET_ERROR) return code;
 
 	//首先创建新文件
 	//注意要使用二进制模式读取文件
 	ofstream newFile(directory + "//" + fileName, ios::trunc | ios::binary);
+	
 
 	command = "RETR " + fileName;
 	sendCommand();
+	if (code == SOCKET_ERROR) {
+		dataDisconnect();
+		return code;
+	}
 	recvMessage();
+	if (code != 125) {
+		return code;
+	}
 
 	memset(recvbuf, 0, sizeof(recvbuf));
 	//接收文件
@@ -302,8 +328,12 @@ int Client::downloadFile(string fileName, string directory)
 	}
 	newFile.write(recvbuf, curIndex);
 
+
+	dataDisconnect();
 	//关闭文件
 	newFile.close();
+	recvMessage();
+	return code;
 }	
 
 void readFile(string fileName)
@@ -320,21 +350,40 @@ void readFile(string fileName)
 
 int Client::uploadFile(string fileName)
 {
-	dataConnect(passiveMode);
-	
-	cout << "发送文件：" << endl;
+	code = dataConnect(passiveMode);
+	if (code == SOCKET_ERROR) {
+		dataDisconnect();
+		return code;
+	}
+
 	command = "STOR " + fileName;
 	sendCommand();
+	if (code == SOCKET_ERROR) {
+		dataDisconnect();
+		return code;
+	}
 	recvMessage();
+	if (code != DATA_CONNECT) {
+		dataDisconnect();
+		return code;
+	}
 
-	cout << "打开要发送的文件" << endl;
+	//在外面应该检测文件是否存在
 	ifstream in(fileName);
+	if (!in.good()) {
+		dataDisconnect();
+		return FILE_OPEN_ERROR;
+	}
+
 	memset(sendbuf, 0, sizeof(sendbuf));
 	int curIndex = 0;
 	int len = 0, lens = 0;
 	while (!in.eof()) {
 		curIndex = in.read(sendbuf, 1024).gcount();
 		while ((len = send(dataSocket, sendbuf + lens, curIndex - lens, 0)) != SOCKET_ERROR && lens != curIndex) {
+			if (len == SOCKET_ERROR) {
+				return SOCKET_ERROR;
+			}
 			lens += len;
 		}
 		lens = 0;
@@ -342,8 +391,7 @@ int Client::uploadFile(string fileName)
 
 	dataDisconnect();
 	recvMessage();
-
-	return 0;
+	return code;
 }
 
 

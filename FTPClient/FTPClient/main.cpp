@@ -33,36 +33,35 @@ int test()
 
 
 	//登录
-	string username, password;
-	cout << "请输入账户名:";
-	cin >> username;
-	cout << "请输入密码:";
-	cin >> password;
-	client.setUsername(username);
-	client.setPassword(password);
-	res = client.login();
-	while (res != PASSWORD_OKAY) {
-		if (res == SOCKET_ERROR) {
-			cout << "网络连接错误" << endl;
-			break;
-		}
-		else {
-			cout << "账号或者密码错误" << endl;
-		}
-		cout << "请输入账户名:";
-		cin >> username;
-		cout << "请输入密码:";
-		cin >> password;
-		client.setUsername(username);
-		client.setPassword(password);
-		res = client.login();
-	}
-	cout << "登录成功\n";
+	//string username, password;
+	//cout << "请输入账户名:";
+	//cin >> username;
+	//cout << "请输入密码:";
+	//cin >> password;
+	//client.setUsername(username);
+	//client.setPassword(password);
+	//res = client.login();
+	//while (res != PASSWORD_OKAY) {
+	//	if (res == SOCKET_ERROR) {
+	//		cout << "网络连接错误" << endl;
+	//		break;
+	//	}
+	//	else {
+	//		cout << "账号或者密码错误" << endl;
+	//	}
+	//	cout << "请输入账户名:";
+	//	cin >> username;
+	//	cout << "请输入密码:";
+	//	cin >> password;
+	//	client.setUsername(username);
+	//	client.setPassword(password);
+	//	res = client.login();
+	//}
+	//cout << "登录成功\n";
 
-/*
-	client.setUsername("");
-	client.setPassword("");
-	client.login();*/
+	client.setUsername("chengzhangyi");
+	client.setPassword("456789");
+	client.login();
 
 	do {
 		char command;
@@ -88,8 +87,8 @@ int test()
 			cout << "请输入文件名\n";
 			cin >> fileName;
 			size = client.fileSize(fileName);
-			if (size != 0) {
-				cout << fileName << "文件大小为" << size << endl;
+			if (size != -10) {
+				cout << fileName << "文件大小为" << size << "字节" <<  endl;
 			}
 			break;
 		case '3':
@@ -97,6 +96,15 @@ int test()
 			cout << "请输出要传入的文件路径:";
 			cin >> fileName;
 			res = client.uploadFile(fileName);
+			if (res != DATA_TRANSFER_COMPLETE) {
+				cout << "文件传输失败：";
+				if (res == FILE_OPEN_ERROR) {
+					cout << "无法打开文件\n";
+				}
+				else if (res == SOCKET_ERROR) {
+					cout << "网络连接失败\n";
+				}
+			}
 			break;
 		case '4':
 			//下载文件
@@ -105,6 +113,9 @@ int test()
 			cout << "请输入存储的目录:";
 			cin >> dir;
 			res = client.downloadFile(fileName, dir);
+			if (res != DATA_TRANSFER_COMPLETE) {
+				cout << "文件传输失败\n";
+			}
 			break;
 		case '5':
 			client.disconnect();
