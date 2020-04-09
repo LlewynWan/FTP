@@ -369,7 +369,7 @@ int Client::uploadFile(string fileName)
 	}
 
 	//在外面应该检测文件是否存在
-	ifstream in(fileName);
+	ifstream in(fileName, ios::binary);
 	if (!in.good()) {
 		dataDisconnect();
 		return FILE_OPEN_ERROR;
